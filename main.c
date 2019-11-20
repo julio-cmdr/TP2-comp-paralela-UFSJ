@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "ecossistema.h"
+#include "ecosystem.h"
 
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
@@ -11,10 +11,10 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	Ecossistema eco = init_ecossistema(argv[1]);
+	Ecosystem eco = ecosystem_init(argv[1]);
 
 	for(int i = 0; i < eco.n; i++)
-		objeto_print(eco.objetos[i]);
+		object_print(eco.objects[i]);
 
 	return 0;
 }
