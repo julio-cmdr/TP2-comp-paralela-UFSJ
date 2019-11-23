@@ -25,6 +25,7 @@ typedef struct ecosystem {
 	int l, c;
 	int n;
 	void **objects;
+	void ***matrix;
 }Ecosystem;
 
 Ecosystem ecosystem_init(char *file);

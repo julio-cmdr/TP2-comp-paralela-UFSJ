@@ -12,6 +12,15 @@ Ecosystem ecosystem_init(char *file) {
 	} else {
 		fscanf(arq, "%d %d %d %d %d %d %d\n", &eco.gen_proc_rabbits, &eco.gen_proc_fox, &eco.gen_comida_fox, &eco.n_gen, &eco.l, &eco.c, &eco.n);
 
+		eco.matrix = (void***) malloc(eco.l * sizeof(void**));
+		for (int i = 0; i < eco.l; i++) {
+			eco.matrix[i] = (void**) malloc(eco.c * sizeof(void*));
+
+			for (int j = 0; j < eco.c; j++) {
+				eco.matrix[i][j] = NULL;
+			}
+		}
+
 		eco.objects = (void**) malloc(eco.n * sizeof(void*));
 
         char tipo[7];
@@ -29,6 +38,8 @@ Ecosystem ecosystem_init(char *file) {
             }else{
 				eco.objects[i] = (void*)new_fox(x, y, 0, 0);
             }
+
+			eco.matrix[x][y] = eco.objects[i];
 		}
 		fclose(arq);
 	}
