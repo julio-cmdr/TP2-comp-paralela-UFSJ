@@ -21,9 +21,13 @@ enum {
 	ROCK = 2
 };
 
-typedef struct common_data{
-	int type;
+typedef struct position{
 	int x, y;
+} Position;
+
+typedef struct common_data{
+	Position pos;
+	int type;
 } Common_data;
 
 typedef struct rock{

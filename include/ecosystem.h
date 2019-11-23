@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "object.h"
 
 typedef struct ecosystem {
@@ -29,5 +30,9 @@ typedef struct ecosystem {
 }Ecosystem;
 
 Ecosystem ecosystem_init(char *file);
+
+bool cell_is_empty(const Ecosystem *eco, int x, int y);
+
+Position get_empty_cell(const Ecosystem *eco, int obj_index);
 
 #endif // ECOSYSTEM_H
