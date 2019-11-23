@@ -16,9 +16,10 @@
 #include <stdlib.h>
 
 enum {
-	RABBIT = 0,
-	FOX = 1,
-	ROCK = 2
+	EMPTY = -1,
+	RABBIT,
+	FOX,
+	ROCK,
 };
 
 typedef struct position{

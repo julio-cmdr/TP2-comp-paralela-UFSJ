@@ -46,14 +46,28 @@ Ecosystem ecosystem_init(char *file) {
 	return eco;
 }
 
-bool cell_is_empty(const Ecosystem *eco, int x, int y) {
-	return x >= 0 && x < eco->c &&
-		y >= 0 && y < eco->l &&
-		eco->matrix[x][y] == NULL;
+bool cell_has_object(const Ecosystem *eco, int x, int y, int type) {
+	if (x < 0 || x >= eco->c || y < 0 || y >= eco->l) {
+		return false;
+	}
+
+	if(type == EMPTY) {
+		return eco->matrix[x][y] == NULL;
+	}
+		
+	return TYPEOF(eco->matrix[x][y]) == type;
 }
 
-Position get_empty_cell(const Ecosystem *eco, int obj_index) {
-    void *obj = eco->objects[obj_index];
+static int f(int x){  // x
+	return (x % 2) * (2 - x);
+}
+
+static int g(int y){  // y
+	return !(y % 2) * (y - 1);
+}
+
+Position get_next_cell(const Ecosystem *eco, int obj_index, int cell_type) {	
+	void *obj = eco->objects[obj_index];
 
     Position *pos = obj;
     int x = pos->x;
@@ -61,16 +75,15 @@ Position get_empty_cell(const Ecosystem *eco, int obj_index) {
     
     Position adj[4];
 
-    int x2, y2, sum, p = 0;
-    for (x2 = -1; x2 < 2; x2++) {
-        for (y2 = -1; y2 < 2; y2++) {
-            sum = x2 + y2;
-            if ((sum == 1 || sum == -1) && !cell_is_empty(eco, x + x2, y + y2)) {    
-                adj[p].x = x2;
-                adj[p].y = y2;
-                p++;
-            }
-        }
+    int x2, y2, p = 0;
+    for(int i = 0; i < 4; i++){
+		x2 = f(x);
+		y2 = g(y);
+		if (!cell_has_object(eco, x + x2, y + y2, cell_type)){    
+			adj[p].x = x + x2;
+			adj[p].y = y + y2;
+			p++;
+		}
     }
 
 	int chosen_p = (eco->n_gen*p + x + y)%p;

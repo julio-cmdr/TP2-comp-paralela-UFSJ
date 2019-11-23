@@ -31,8 +31,8 @@ typedef struct ecosystem {
 
 Ecosystem ecosystem_init(char *file);
 
-bool cell_is_empty(const Ecosystem *eco, int x, int y);
+bool cell_has_object(const Ecosystem *eco, int x, int y, int type);
 
-Position get_empty_cell(const Ecosystem *eco, int obj_index);
+Position get_next_cell(const Ecosystem *eco, int obj_index, int cell_type);
 
 #endif // ECOSYSTEM_H
