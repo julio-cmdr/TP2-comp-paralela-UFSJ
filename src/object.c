@@ -14,32 +14,33 @@ void object_print(void *obj){
     }
 }
 
+void *new_object(int type, size_t size, int x, int y) {
+    Common_data *object = malloc(size);
+
+    object->type = type;
+    object->pos.x = x;
+    object->pos.y = y;
+
+    return object;
+}
+
 Rock *new_rock(int x, int y){
-    Rock *rock = (Rock*)malloc(sizeof(Rock));
-    rock->data.type = ROCK;
-    rock->data.pos.x = x;
-    rock->data.pos.y = y;
+    Rock *rock = new_object(ROCK, sizeof(Rock), x, y);
     
     return rock;
 }
 
-Rabbit *new_rabbit(int x, int y, int generation){
-    Rabbit *rabbit = (Rabbit*)malloc(sizeof(Rabbit));
-    rabbit->data.type = RABBIT;
-    rabbit->data.pos.x = x;
-    rabbit->data.pos.y = y;
-    rabbit->generation = generation;
+Rabbit *new_rabbit(int x, int y){
+    Rabbit *rabbit = new_object(RABBIT, sizeof(Rabbit), x, y);
+    rabbit->generation = 0;
 
     return rabbit;
 }
 
-Fox *new_fox(int x, int y, int generation, int hungry){
-    Fox *fox = malloc(sizeof(Fox));
-    fox->data.type = FOX;
-    fox->data.pos.x = x;
-    fox->data.pos.y = y;
-    fox->hungry = hungry;
-    fox->generation = generation;
+Fox *new_fox(int x, int y){
+    Fox *fox = new_object(FOX, sizeof(Fox), x, y);
+    fox->hungry = 0;
+    fox->generation = 0;
 
     return fox;
 }

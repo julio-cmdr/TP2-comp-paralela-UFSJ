@@ -21,7 +21,7 @@
 typedef struct ecosystem {
 	int gen_proc_rabbits;
 	int gen_proc_fox;
-	int gen_comida_fox;
+	int gen_food_fox;
 	int n_gen;
 	int l, c;
 	int n;
@@ -33,6 +33,10 @@ Ecosystem ecosystem_init(char *file);
 
 bool cell_has_object(const Ecosystem *eco, int x, int y, int type);
 
-Position get_next_cell(const Ecosystem *eco, int obj_index, int cell_type);
+bool get_next_cell(const Ecosystem *eco, int obj_index, Position *pos, int cell_type);
+
+void move_rabbit(Ecosystem *eco, int index);
+
+void move_fox(Ecosystem *eco, int index);
 
 #endif // ECOSYSTEM_H

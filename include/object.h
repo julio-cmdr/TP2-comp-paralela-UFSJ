@@ -48,12 +48,14 @@ typedef struct rabbit{
 
 #define TYPEOF(a) ((Common_data*)(a))->type
 
+#define KILL(o) ((o).pos.x = -1, (o).pos.y = -1)
+
 void object_print(void *obj);
 
 Rock *new_rock(int x, int y);
 
-Rabbit *new_rabbit(int x, int y, int generation);
+Rabbit *new_rabbit(int x, int y);
 
-Fox *new_fox(int x, int y, int generation, int hungry);
+Fox *new_fox(int x, int y);
 
 #endif // OBJECT_H

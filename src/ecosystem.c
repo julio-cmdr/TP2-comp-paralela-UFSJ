@@ -10,7 +10,7 @@ Ecosystem ecosystem_init(char *file) {
 		perror("Erro ao abrir o arquivo!\n");
 		exit(1);
 	} else {
-		fscanf(arq, "%d %d %d %d %d %d %d\n", &eco.gen_proc_rabbits, &eco.gen_proc_fox, &eco.gen_comida_fox, &eco.n_gen, &eco.l, &eco.c, &eco.n);
+		fscanf(arq, "%d %d %d %d %d %d %d\n", &eco.gen_proc_rabbits, &eco.gen_proc_fox, &eco.gen_food_fox, &eco.n_gen, &eco.l, &eco.c, &eco.n);
 
 		eco.matrix = (void***) malloc(eco.l * sizeof(void**));
 		for (int i = 0; i < eco.l; i++) {
@@ -33,10 +33,10 @@ Ecosystem ecosystem_init(char *file) {
 				eco.objects[i] = (void*)new_rock(x, y);
 
 			}else if(strcmp(tipo, "COELHO") == 0){
-				eco.objects[i] = (void*)new_rabbit(x, y, 0);
+				eco.objects[i] = (void*)new_rabbit(x, y);
 
 			}else{
-				eco.objects[i] = (void*)new_fox(x, y, 0, 0);
+				eco.objects[i] = (void*)new_fox(x, y);
 			}
 
 			eco.matrix[x][y] = eco.objects[i];
@@ -58,18 +58,16 @@ bool cell_has_object(const Ecosystem *eco, int x, int y, int type) {
 	return TYPEOF(eco->matrix[x][y]) == type;
 }
 
-static int f(int x){  // x
-	return (x % 2) * (2 - x);
-}
+bool get_next_cell(const Ecosystem *eco, int obj_index, Position *pos, int cell_type) {	
+	int f(int x){  // x
+		return (x % 2) * (2 - x);
+	}
 
-static int g(int y){  // y
-	return !(y % 2) * (y - 1);
-}
+	int g(int y){  // y
+		return !(y % 2) * (y - 1);
+	}
 
-Position get_next_cell(const Ecosystem *eco, int obj_index, int cell_type) {	
-	void *obj = eco->objects[obj_index];
-
-    Position *pos = obj;
+    pos = eco->objects[obj_index];
     int x = pos->x;
     int y = pos->y;
     
@@ -85,8 +83,58 @@ Position get_next_cell(const Ecosystem *eco, int obj_index, int cell_type) {
 			p++;
 		}
     }
+	
+	if(p > 0){
+		pos = &adj[(eco->n_gen*p + x + y)%p];
+		return true;
+	}
+	
+	return false;
+}
 
-	int chosen_p = (eco->n_gen*p + x + y)%p;
+void move_rabbit(Ecosystem *eco, int index){
+	Position next_pos;
+	Rabbit *rabbit = eco->objects[index];
 
-	return adj[chosen_p];
+	if (get_next_cell(eco, index, &next_pos, EMPTY)){
+		if(rabbit->generation == eco->gen_proc_rabbits){
+			Rabbit *child_rabbit = new_rabbit(rabbit->data.pos.x, rabbit->data.pos.y);
+			rabbit->generation = -1;
+		}
+		rabbit->data.pos = next_pos;
+	}
+	
+	rabbit->generation++;
+
+	// ADICIONAR/RETORNAR O FILHO
+}
+
+void move_fox(Ecosystem *eco, int index){
+	Fox *fox = eco->objects[index];
+
+	Position next_pos;
+	bool moved = get_next_cell(eco, index, &next_pos, RABBIT);
+
+	if (!moved) {
+		// Killing the fox.
+		if (fox->hungry == eco->gen_food_fox) {
+			KILL(fox->data);
+
+			return;
+		} else {
+			// Tries to go to an empty cell.
+			moved = get_next_cell(eco, index, &next_pos, EMPTY);
+		}
+	}
+	
+	if (moved) {
+		if(fox->generation == eco->gen_proc_fox) {
+			Fox *child_fox = new_fox(fox->data.pos.x, fox->data.pos.y);
+			fox->generation = -1;
+		}
+		fox->data.pos = next_pos;
+	}
+	fox->generation++;
+
+	// ADICIONAR/RETORNAR O FILHO
 }
