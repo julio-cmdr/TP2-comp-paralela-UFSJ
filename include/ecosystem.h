@@ -25,15 +25,16 @@ typedef struct ecosystem {
 	int n_gen;
 	int l, c;
 	int n;
-	void **objects;
-	void ***matrix;
+	int animal_count[2];
+	void **animals[2];
+	Object **matrix;
 }Ecosystem;
 
 Ecosystem ecosystem_init(char *file);
 
 bool cell_has_object(const Ecosystem *eco, int x, int y, int type);
 
-bool get_next_cell(const Ecosystem *eco, int obj_index, Position *pos, int cell_type);
+bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, Position *pos, int cell_type);
 
 void move_rabbit(Ecosystem *eco, int index);
 

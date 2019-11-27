@@ -26,36 +26,36 @@ typedef struct position{
 	int x, y;
 } Position;
 
-typedef struct common_data{
+typedef struct animal{
 	Position pos;
 	int type;
-} Common_data;
-
-typedef struct rock{
-	Common_data data;
-}Rock;
+	int generation;
+} Animal;
 
 typedef struct fox{
-	Common_data data;
+	Animal data;
+	struct fox *child;
 	int hungry;
-	int generation;
 }Fox;
 
 typedef struct rabbit{
-	Common_data data;
-	int generation;
+	Animal data;
+	struct rabbit *child;
 }Rabbit;
 
-#define TYPEOF(a) ((Common_data*)(a))->type
+typedef struct object {
+	int type;
+	int index;
+} Object;
+
+#define TYPEOF(a) ((Animal*)(a))->type
 
 #define KILL(o) ((o).pos.x = -1, (o).pos.y = -1)
 
 void object_print(void *obj);
 
-Rock *new_rock(int x, int y);
+void *new_rabbit(int x, int y);
 
-Rabbit *new_rabbit(int x, int y);
-
-Fox *new_fox(int x, int y);
+void *new_fox(int x, int y);
 
 #endif // OBJECT_H
