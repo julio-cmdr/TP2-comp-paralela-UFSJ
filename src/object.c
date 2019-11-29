@@ -11,26 +11,28 @@ void object_print(void *obj){
     }
 }
 
-void *new_object(int type, size_t size, int x, int y) {
+void *new_animal(int type, size_t size, int x, int y) {
     Animal *object = malloc(size);
 
     object->type = type;
     object->pos.x = x;
     object->pos.y = y;
+    object->next_pos.x = x;
+    object->next_pos.y = y;
     object->generation = 0;
 
     return object;
 }
 
 void *new_rabbit(int x, int y){
-    Rabbit *rabbit = new_object(RABBIT, sizeof(Rabbit), x, y);
+    Rabbit *rabbit = new_animal(RABBIT, sizeof(Rabbit), x, y);
     rabbit->child = NULL;
 
     return rabbit;
 }
 
 void *new_fox(int x, int y){
-    Fox *fox = new_object(FOX, sizeof(Fox), x, y);
+    Fox *fox = new_animal(FOX, sizeof(Fox), x, y);
     fox->hungry = 0;
     fox->child = NULL;
 

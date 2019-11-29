@@ -34,10 +34,12 @@ Ecosystem ecosystem_init(char *file);
 
 bool cell_has_object(const Ecosystem *eco, int x, int y, int type);
 
-bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, Position *pos, int cell_type);
+bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, int cell_type);
 
 void move_rabbit(Ecosystem *eco, int index);
 
 void move_fox(Ecosystem *eco, int index);
+
+void ecosystem_print(const Ecosystem *eco);
 
 #endif // ECOSYSTEM_H

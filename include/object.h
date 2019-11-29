@@ -28,6 +28,7 @@ typedef struct position{
 
 typedef struct animal{
 	Position pos;
+	Position next_pos;
 	int type;
 	int generation;
 } Animal;
