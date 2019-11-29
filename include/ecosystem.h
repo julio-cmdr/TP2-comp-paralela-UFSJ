@@ -32,7 +32,7 @@ typedef struct ecosystem {
 
 Ecosystem ecosystem_init(char *file);
 
-bool cell_has_object(const Ecosystem *eco, int x, int y, int type);
+bool cell_has_object(const Ecosystem *eco, int l, int c, int type);
 
 bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, int cell_type);
 
@@ -40,6 +40,12 @@ void move_rabbit(Ecosystem *eco, int index);
 
 void move_fox(Ecosystem *eco, int index);
 
-void ecosystem_print(const Ecosystem *eco);
+void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, int type2);
+
+int ecosystem_normalize(Ecosystem *eco, int type);
+
+int ecosystem_update_position(Ecosystem *eco, int animal_index, int type);
+
+void ecosystem_print(const Ecosystem *eco, int current_gen);
 
 #endif // ECOSYSTEM_H

@@ -28,22 +28,22 @@ Ecosystem ecosystem_init(char *file) {
 		eco.animals[FOX] = malloc(eco.l * eco.c * sizeof *eco.animals[FOX]);
 
 		char type[7];
-		int x, y;
+		int l, c;
 		void *(*constructors[2])(int, int) = {
 			new_rabbit, new_fox
 		};
 
 		for (int i = 0; i < eco.n; i++) {
-			fscanf(arq,"%s %d %d\n", type, &x, &y);
+			fscanf(arq,"%s %d %d\n", type, &l, &c);
 
 			if(strcmp(type, "ROCHA") == 0){
-				eco.matrix[x][y].type = ROCK;
-				eco.matrix[x][y].index = -1;
+				eco.matrix[l][c].type = ROCK;
+				eco.matrix[l][c].index = -1;
 			} else {
 				int animal_id = (type[0] % 2 == 0);
-				eco.animals[animal_id][eco.animal_count[animal_id]] = constructors[animal_id](x, y);
-				eco.matrix[x][y].index = eco.animal_count[animal_id];
-				eco.matrix[x][y].type = animal_id;
+				eco.animals[animal_id][eco.animal_count[animal_id]] = constructors[animal_id](l, c);
+				eco.matrix[l][c].index = eco.animal_count[animal_id];
+				eco.matrix[l][c].type = animal_id;
 				eco.animal_count[animal_id]++;
 			}
 		}
@@ -52,35 +52,44 @@ Ecosystem ecosystem_init(char *file) {
 	return eco;
 }
 
-bool cell_has_object(const Ecosystem *eco, int x, int y, int type) {
-	if (x < 0 || x >= eco->c || y < 0 || y >= eco->l) {
+bool cell_has_object(const Ecosystem *eco, int l, int c, int type) {
+	if (l < 0 || l >= eco->l || c < 0 || c >= eco->c) {
 		return false;
 	}
 
-	return eco->matrix[y][x].type == type;
+	return eco->matrix[l][c].type == type;
 }
 
 bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, int cell_type) {
     Animal *animal = eco->animals[obj_type][obj_index];
-    int x = animal->pos.x;
-    int y = animal->pos.y;
+    int l = animal->pos.l;
+    int c = animal->pos.c;
 
     Position adj[4];
 
-    int x2, y2, p = 0;
+    int lo, co, p = 0;
     for(int i = 0; i < 4; i++){
-		x2 = (i % 2) * (2 - i);
-		y2 = !(i % 2) * (i - 1);
-		if (cell_has_object(eco, x + x2, y + y2, cell_type)) {
-			adj[p].x = x + x2;
-			adj[p].y = y + y2;
+		/* * * * * * * * * *
+		 *      offsets    *
+		 *       l |  c    *
+		 *   0: -1 |  0    *
+		 *   1:  0 |  1    *
+		 *   2:  1 |  0    *
+		 *   3:  0 | -1    *
+		 * * * * * * * * * */
+		lo = !(i & 1) * (i - 1);
+		co = (i & 1) * (2 - i);
+
+		if (cell_has_object(eco, l + lo, c + co, cell_type)) {
+			adj[p].l = l + lo;
+			adj[p].c = c + co;
 			p++;
 		}
     }
 
 	if(p > 0){
 		// fórmula para escolha da próxima célula
-		animal->next_pos = adj[(eco->n_gen + x + y) % p];
+		animal->next_pos = adj[(eco->n_gen + l + c) % p];
 		return true;
 	}
 
@@ -92,7 +101,7 @@ void move_rabbit(Ecosystem *eco, int index){
 
 	if (get_next_cell(eco, RABBIT, index, EMPTY)){
 		if(rabbit->data.generation == eco->gen_proc_rabbits){
-			rabbit->child = new_rabbit(rabbit->data.pos.x, rabbit->data.pos.y);
+			rabbit->data.child = new_rabbit(rabbit->data.pos.l, rabbit->data.pos.c);
 			rabbit->data.generation = -1;
 		}
 	}
@@ -119,15 +128,114 @@ void move_fox(Ecosystem *eco, int index){
 
 	if (moved) {
 		if(fox->data.generation == eco->gen_proc_fox) {
-			fox->child = new_fox(fox->data.pos.x, fox->data.pos.y);
+			fox->data.child = new_fox(fox->data.pos.l, fox->data.pos.c);
 			fox->data.generation = -1;
 		}
 	}
 	fox->data.generation++;
 }
 
-void ecosystem_print(const Ecosystem *eco) {
+void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, int type2) {
+	Animal *animal1 = eco->animals[type1][animal1_index];
+
+	if (animal1 != NULL) {
+		int d = type1 == type2 ? 0 : (type1 == RABBIT ? -1 : 1);
+
+		for (int animal2_index = 0; animal2_index < eco->animal_count[type2]; animal2_index++) {
+			Animal *animal2 = eco->animals[type2][animal2_index];
+
+			if (
+				animal1_index != animal2_index && animal2 != NULL &&
+				animal1->next_pos.l == animal2->next_pos.l &&
+				animal1->next_pos.c == animal2->next_pos.c
+			) {
+				int killed_index;
+				int killed_type;
+				if (d > 0) {
+					killed_type = type2;
+					killed_index = animal2_index;
+				} else if (d < 0) {
+					killed_type = type1;
+					killed_index = animal1_index;
+				} else {
+					if (animal1->generation < animal2->generation) {
+						killed_type = type1;
+						killed_index = animal1_index;
+					} else {
+						killed_type = type2;
+						killed_index = animal2_index;
+					}
+					killed_index = animal1->generation < animal2->generation ? animal1_index : animal2_index;
+				}
+
+				Animal *killed_animal = eco->animals[killed_type][killed_index];
+				eco->matrix[killed_animal->pos.l][killed_animal->pos.c].index = -1;
+				eco->matrix[killed_animal->pos.l][killed_animal->pos.c].type = EMPTY;
+
+				free(killed_animal);
+				eco->animals[RABBIT][killed_index] = NULL;
+			}
+		}
+	}
+}
+
+int ecosystem_normalize(Ecosystem *eco, int type) {
+	int animal_count = 0;
+	int next_index = 1;
+	for (int i = 0; i < eco->animal_count[type]; i++) {
+		if (eco->animals[type][i] == NULL) {
+			while (next_index < eco->animal_count[type] && eco->animals[type][next_index] == NULL) {
+				next_index++;
+			}
+
+			if (next_index == eco->animal_count[type]) {
+				break;
+			}
+
+			eco->animals[type][i] = eco->animals[type][next_index];
+			eco->animals[type][next_index] = NULL;
+			next_index++;
+			animal_count++;
+		} else {
+			animal_count++;
+			next_index = i + 2;
+		}
+	}
+
+	return animal_count;
+}
+
+int ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
+	int animal_count = eco->animal_count[type];
+	Animal *animal = eco->animals[RABBIT][animal_index];
+	if (animal->child != NULL) {
+		eco->animals[RABBIT][animal_count] = animal->child;
+		eco->matrix[animal->pos.l][animal->pos.c].index = animal_count++;
+		animal->child = NULL;
+	} else {
+		eco->matrix[animal->pos.l][animal->pos.c].type = EMPTY;
+		eco->matrix[animal->pos.l][animal->pos.c].index = -1;
+	}
+
+	animal->pos = animal->next_pos;
+	eco->matrix[animal->pos.l][animal->pos.c].type = RABBIT;
+	eco->matrix[animal->pos.l][animal->pos.c].index = animal_index;
+
+	return animal_count;
+}
+
+void ecosystem_print(const Ecosystem *eco, int current_gen) {
+	system("clear");
+	printf("Gen %d\n", current_gen);
+
+	for(int i = 0; i < eco->c * 2 + 2; i++) {
+		putchar('-');
+	}
+	putchar('\n');
+
+
 	for(int i = 0; i < eco->l; i++){
+		putchar('|');
 		for(int j = 0; j < eco->c; j++){
 			if(eco->matrix[i][j].type != EMPTY){
 				printf("%d ", eco->matrix[i][j].type);
@@ -135,6 +243,13 @@ void ecosystem_print(const Ecosystem *eco) {
 				printf("- ");
 			}
 		}
-		printf("\n");
+		printf("|\n");
 	}
+
+	for(int i = 0; i < eco->c * 2 + 2; i++) {
+		putchar('-');
+	}
+	putchar('\n');
+
+	getchar();
 }

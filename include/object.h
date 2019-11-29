@@ -23,7 +23,7 @@ enum {
 };
 
 typedef struct position{
-	int x, y;
+	int l, c;
 } Position;
 
 typedef struct animal{
@@ -31,17 +31,16 @@ typedef struct animal{
 	Position next_pos;
 	int type;
 	int generation;
+	void *child;
 } Animal;
 
 typedef struct fox{
 	Animal data;
-	struct fox *child;
 	int hungry;
 }Fox;
 
 typedef struct rabbit{
 	Animal data;
-	struct rabbit *child;
 }Rabbit;
 
 typedef struct object {
@@ -51,12 +50,12 @@ typedef struct object {
 
 #define TYPEOF(a) ((Animal*)(a))->type
 
-#define KILL(o) ((o).pos.x = -1, (o).pos.y = -1)
+#define KILL(o) ((o).pos.l = -1, (o).pos.c = -1)
 
 void object_print(void *obj);
 
-void *new_rabbit(int x, int y);
+void *new_rabbit(int l, int c);
 
-void *new_fox(int x, int y);
+void *new_fox(int l, int c);
 
 #endif // OBJECT_H
