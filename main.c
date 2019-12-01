@@ -22,12 +22,10 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	printf("\n");
-	ecosystem_print(&eco, 0);
-
 	int rabbit_count = 0;
 
-	for(i = 0; i < eco.n_gen; i++){
+	for(eco.current_gen = 0; eco.current_gen < eco.n_gen; eco.current_gen++){
+		ecosystem_print(&eco);
 		// Deciding movement
 		for(j = 0; j < eco.animal_count[RABBIT]; j++){
 			move_rabbit(&eco, j);
@@ -45,7 +43,7 @@ int main(int argc, char *argv[]) {
 
 		// Updating the position.
 		for (j = 0; j < eco.animal_count[RABBIT]; j++) {
-			rabbit_count += ecosystem_update_position(&eco, j, RABBIT);
+			rabbit_count = ecosystem_update_position(&eco, j, RABBIT);
 		}
 
 		eco.animal_count[RABBIT] = rabbit_count;
@@ -55,8 +53,9 @@ int main(int argc, char *argv[]) {
 			move_fox(&eco, j);
 		}
 		*/
-		ecosystem_print(&eco, i + 1);
+
 	}
+	ecosystem_print(&eco);
 
 	return 0;
 }

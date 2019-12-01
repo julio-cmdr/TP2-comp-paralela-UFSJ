@@ -22,6 +22,7 @@ typedef struct ecosystem {
 	int gen_proc_rabbits;
 	int gen_proc_fox;
 	int gen_food_fox;
+	int current_gen;
 	int n_gen;
 	int l, c;
 	int n;
@@ -46,6 +47,6 @@ int ecosystem_normalize(Ecosystem *eco, int type);
 
 int ecosystem_update_position(Ecosystem *eco, int animal_index, int type);
 
-void ecosystem_print(const Ecosystem *eco, int current_gen);
+void ecosystem_print(const Ecosystem *eco);
 
 #endif // ECOSYSTEM_H

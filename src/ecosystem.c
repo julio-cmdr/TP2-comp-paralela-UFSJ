@@ -89,7 +89,7 @@ bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, int cell_t
 
 	if(p > 0){
 		// fórmula para escolha da próxima célula
-		animal->next_pos = adj[(eco->n_gen + l + c) % p];
+		animal->next_pos = adj[(eco->current_gen + l + c) % p];
 		return true;
 	}
 
@@ -224,9 +224,9 @@ int ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 	return animal_count;
 }
 
-void ecosystem_print(const Ecosystem *eco, int current_gen) {
+void ecosystem_print(const Ecosystem *eco) {
 	system("clear");
-	printf("Gen %d\n", current_gen);
+	printf("Gen %d\n", eco->current_gen);
 
 	for(int i = 0; i < eco->c * 2 + 2; i++) {
 		putchar('-');
