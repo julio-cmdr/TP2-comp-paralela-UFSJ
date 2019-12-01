@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
 		// Updating the position.
 		for (j = 0; j < eco.animal_count[RABBIT]; j++) {
-			rabbit_count = ecosystem_update_position(&eco, j, RABBIT);
+			ecosystem_update_position(&eco, j, RABBIT, &rabbit_count);
 		}
 
 		eco.animal_count[RABBIT] = rabbit_count;

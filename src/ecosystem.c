@@ -205,12 +205,11 @@ int ecosystem_normalize(Ecosystem *eco, int type) {
 	return animal_count;
 }
 
-int ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
-	int animal_count = eco->animal_count[type];
+void ecosystem_update_position(Ecosystem *eco, int animal_index, int type, int *animal_count) {
 	Animal *animal = eco->animals[RABBIT][animal_index];
 	if (animal->child != NULL) {
-		eco->animals[RABBIT][animal_count] = animal->child;
-		eco->matrix[animal->pos.l][animal->pos.c].index = animal_count++;
+		eco->animals[RABBIT][*animal_count] = animal->child;
+		eco->matrix[animal->pos.l][animal->pos.c].index = (*animal_count)++;
 		animal->child = NULL;
 	} else {
 		eco->matrix[animal->pos.l][animal->pos.c].type = EMPTY;
@@ -220,15 +219,13 @@ int ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 	animal->pos = animal->next_pos;
 	eco->matrix[animal->pos.l][animal->pos.c].type = RABBIT;
 	eco->matrix[animal->pos.l][animal->pos.c].index = animal_index;
-
-	return animal_count;
 }
 
 void ecosystem_print(const Ecosystem *eco) {
 	system("clear");
 	printf("Gen %d\n", eco->current_gen);
 
-	for(int i = 0; i < eco->c * 2 + 2; i++) {
+	for(int i = 0; i < eco->c * 3 + 2; i++) {
 		putchar('-');
 	}
 	putchar('\n');
@@ -238,15 +235,16 @@ void ecosystem_print(const Ecosystem *eco) {
 		putchar('|');
 		for(int j = 0; j < eco->c; j++){
 			if(eco->matrix[i][j].type != EMPTY){
-				printf("%d ", eco->matrix[i][j].type);
+				int type = eco->matrix[i][j].type;
+				printf("\033[0;%sm%2d \033[0m", type == RABBIT ? "32" : (type == FOX ? "31" : "33"), eco->matrix[i][j].index);
 			}else{
-				printf("- ");
+				printf(" - ");
 			}
 		}
 		printf("|\n");
 	}
 
-	for(int i = 0; i < eco->c * 2 + 2; i++) {
+	for(int i = 0; i < eco->c * 3 + 2; i++) {
 		putchar('-');
 	}
 	putchar('\n');

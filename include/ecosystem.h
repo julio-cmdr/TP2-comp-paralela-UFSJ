@@ -45,7 +45,7 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 
 int ecosystem_normalize(Ecosystem *eco, int type);
 
-int ecosystem_update_position(Ecosystem *eco, int animal_index, int type);
+void ecosystem_update_position(Ecosystem *eco, int animal_index, int type, int *animal_count);
 
 void ecosystem_print(const Ecosystem *eco);
 
