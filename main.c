@@ -22,8 +22,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	int rabbit_count = 0;
-
 	for(eco.current_gen = 0; eco.current_gen < eco.n_gen; eco.current_gen++){
 		ecosystem_print(&eco);
 		// Deciding movement
@@ -31,26 +29,34 @@ int main(int argc, char *argv[]) {
 			move_rabbit(&eco, j);
 		}
 
-		// Synchronizing.
-		// TODO: otimizar
 		for(j = 0; j < eco.animal_count[RABBIT]; j++){
 			ecosystem_resolve_conflicts(&eco, j, RABBIT, RABBIT);
 		}
-		// Normalizing the list.
-		// TODO: talvez deixar o loop de fora p/ facilitar a paralelização?
-		rabbit_count = ecosystem_normalize(&eco, RABBIT);
-		eco.animal_count[RABBIT] = rabbit_count;
 
 		// Updating the position.
 		for (j = 0; j < eco.animal_count[RABBIT]; j++) {
-			ecosystem_update_position(&eco, j, RABBIT, &rabbit_count);
+			ecosystem_update_position(&eco, j, RABBIT);
 		}
 
-		eco.animal_count[RABBIT] = rabbit_count;
+		ecosystem_print(&eco);
 
 		for(j = 0; j < eco.animal_count[FOX]; j++){
 			move_fox(&eco, j);
 		}
+
+		for(j = 0; j < eco.animal_count[FOX]; j++){
+			ecosystem_resolve_conflicts(&eco, j, FOX, RABBIT);
+			ecosystem_resolve_conflicts(&eco, j, FOX, FOX);
+		}
+
+		// Updating the position.
+		for (j = 0; j < eco.animal_count[FOX]; j++) {
+			ecosystem_update_position(&eco, j, FOX);
+		}
+		
+		// TODO: talvez deixar o loop de fora p/ facilitar a paralelização?
+		ecosystem_normalize(&eco, RABBIT);
+		ecosystem_normalize(&eco, FOX);
 	}
 	ecosystem_print(&eco);
 

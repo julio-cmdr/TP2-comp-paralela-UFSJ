@@ -43,9 +43,9 @@ void move_fox(Ecosystem *eco, int index);
 
 void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, int type2);
 
-int ecosystem_normalize(Ecosystem *eco, int type);
+void ecosystem_normalize(Ecosystem *eco, int type);
 
-void ecosystem_update_position(Ecosystem *eco, int animal_index, int type, int *animal_count);
+void ecosystem_update_position(Ecosystem *eco, int animal_index, int type);
 
 void ecosystem_print(const Ecosystem *eco);
 
