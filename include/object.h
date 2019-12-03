@@ -52,7 +52,7 @@ typedef struct object {
 
 #define KILL(o) ((o).pos.l = -1, (o).pos.c = -1)
 
-void object_print(void *obj);
+void object_print(int type, int l, int c);
 
 void *new_rabbit(int l, int c);
 

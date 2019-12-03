@@ -1,14 +1,11 @@
 #include "object.h"
 #include "ecosystem.h"
 
-void object_print(void *obj){
-    if(TYPEOF(obj) == RABBIT){
-        Rabbit *rabbit = obj;
-        printf("Rabbit pos (%d, %d) generation: %d\n", rabbit->data.pos.l, rabbit->data.pos.c, rabbit->data.generation);
-    }else if(TYPEOF(obj) == FOX){
-        Fox *fox = obj;
-        printf("Fox    pos (%d, %d) generation: %d hungry: %d\n", fox->data.pos.l, fox->data.pos.c, fox->data.generation, fox->hungry);
-    }
+void object_print(int type, int l, int c){
+    static char types[][16] = {
+        "COELHO", "RAPOSA", "ROCHA"
+    };
+    printf("%s %d %d\n", types[type], l, c);
 }
 
 void *new_animal(int type, size_t size, int l, int c) {

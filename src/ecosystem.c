@@ -6,7 +6,7 @@ Ecosystem ecosystem_init(char *file) {
 	FILE *arq;
 	arq = fopen(file, "r");
 
-	eco.animal_count[0] = eco.animal_count[1] = 0;
+	eco.animal_count[0] = eco.animal_count[1] = eco.rock_count = 0;
 
 	if (arq == NULL) {
 		perror("Erro ao abrir o arquivo!\n");
@@ -39,6 +39,7 @@ Ecosystem ecosystem_init(char *file) {
 			if(strcmp(type, "ROCHA") == 0){
 				eco.matrix[l][c].type = ROCK;
 				eco.matrix[l][c].index = -1;
+				eco.rock_count++;
 			} else {
 				int animal_id = (type[0] % 2 == 0);
 				eco.animals[animal_id][eco.animal_count[animal_id]] = constructors[animal_id](l, c);
@@ -215,10 +216,9 @@ void ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 		return;
 	}
 
-	int animal_count = eco->animal_count[type];
 	if (animal->child != NULL) {
-		eco->animals[type][animal_count] = animal->child;
-		eco->matrix[animal->pos.l][animal->pos.c].index = animal_count++;
+		eco->animals[type][eco->animal_count[type]] = animal->child;
+		eco->matrix[animal->pos.l][animal->pos.c].index = eco->animal_count[type]++;
 		animal->child = NULL;
 	} else {
 		eco->matrix[animal->pos.l][animal->pos.c].type = EMPTY;
