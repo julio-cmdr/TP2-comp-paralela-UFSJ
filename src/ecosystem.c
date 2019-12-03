@@ -139,7 +139,7 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 	Animal *animal1 = eco->animals[type1][animal1_index];
 
 	if (animal1 != NULL) {
-		int d = type1 == type2 ? 0 : (type1 == RABBIT ? -1 : 1);
+		int d = type1 == type2 ? 0 : (type1 == RABBIT ? -1 : 1); // pode ser substituído por type1 - type2
 
 		for (int animal2_index = 0; animal2_index < eco->animal_count[type2]; animal2_index++) {
 			Animal *animal2 = eco->animals[type2][animal2_index];

@@ -48,12 +48,9 @@ int main(int argc, char *argv[]) {
 
 		eco.animal_count[RABBIT] = rabbit_count;
 
-		/*
 		for(j = 0; j < eco.animal_count[FOX]; j++){
 			move_fox(&eco, j);
 		}
-		*/
-
 	}
 	ecosystem_print(&eco);
 
