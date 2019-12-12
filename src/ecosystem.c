@@ -230,7 +230,12 @@ void ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 	eco->matrix[animal->pos.l][animal->pos.c].index = animal_index;
 }
 
-void ecosystem_print(const Ecosystem *eco) {	
+bool gverbose = false;
+
+void ecosystem_print(const Ecosystem *eco) {
+	if (!gverbose) {
+		return;
+	}
 	system("clear");
 	printf("Gen %d\n", eco->current_gen);
 

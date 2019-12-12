@@ -14,11 +14,11 @@ int main(int argc, char *argv[]) {
 	int i, j;
 	Ecosystem eco = ecosystem_init(argv[1]);
 
-	for(i = 0; i < eco.l; i++) {
-		for (j = 0; j < eco.c; j++) {
-			if (eco.matrix[i][j].index != -1) {
-				object_print(eco.matrix[i][j].type, i, j);
-			}
+	extern int gverbose;
+	for (i = 2; i < argc; i++) {
+		if (strcmp(argv[i], "-v") == 0) {
+			gverbose = true;
+			break;
 		}
 	}
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 		for (j = 0; j < eco.animal_count[FOX]; j++) {
 			ecosystem_update_position(&eco, j, FOX);
 		}
-		
+
 		// TODO: talvez deixar o loop de fora p/ facilitar a paralelização?
 		ecosystem_normalize(&eco, RABBIT);
 		ecosystem_normalize(&eco, FOX);

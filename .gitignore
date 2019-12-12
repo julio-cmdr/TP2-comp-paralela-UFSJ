@@ -37,7 +37,8 @@ obj
 *.dSYM/
 
 #Project folders and files
-nbproject
-.vscode
+nbproject/
+.vscode/
+entradas/
 ecosystem
-entrada*.txt
+report-*
