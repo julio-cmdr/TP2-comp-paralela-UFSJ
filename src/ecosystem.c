@@ -143,51 +143,58 @@ void move_fox(Ecosystem *eco, int index){
 
 void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, int type2) {
 	Animal *animal1 = eco->animals[type1][animal1_index];
+	Animal *animal2 = NULL;
 
 	if (animal1 != NULL) {
-		int d = type1 == type2 ? 0 : (type1 == RABBIT ? -1 : 1); // pode ser substituído por type1 - type2
+		int d = type1 - type2;
+		bool kill = false;
+		bool kill_by_index = false;
 
-		int animal2_index = 0;
-		if (d == 0) {
-			animal2_index = animal1_index + 1;
-		}
-		for (; animal2_index < eco->animal_count[type2]; animal2_index++) {
-			Animal *animal2 = eco->animals[type2][animal2_index];
+		//int animal2_index = d == 0 ? animal1_index + 1 : 0;
+		for (int animal2_index = 0; animal2_index < eco->animal_count[type2]; animal2_index++) {
+			animal2 = eco->animals[type2][animal2_index];
 
 			if (
-				!(d == 0 && animal1_index == animal2_index) && animal2 != NULL &&
+				animal1 != animal2 && animal2 != NULL &&
 				animal1->next_pos.l == animal2->next_pos.l &&
 				animal1->next_pos.c == animal2->next_pos.c
 			) {
-				int killed_index;
-				int killed_type;
-				if (d == 0) {
+				if (d == 0) { // Animais são do mesmo tipo.
 					if (animal1->generation < animal2->generation) {
-						killed_type = type1;
-						killed_index = animal1_index;
-					} else {
-						killed_type = type2;
-						killed_index = animal2_index;
+						kill = true;
+					} else if (animal1->generation == animal2->generation) {
+						kill_by_index = true;
+						if (type1 == FOX) {
+							if (((Fox *) animal1)->hungry > ((Fox *) animal2)->hungry) {
+								kill = true;
+								kill_by_index = false;
+							} else if (((Fox *) animal1)->hungry < ((Fox *) animal2)->hungry) {
+								kill_by_index = false;
+							}
+						}
+
+						if (kill_by_index) {
+							kill = animal1_index > animal2_index;
+						}
 					}
-					killed_index = animal1->generation < animal2->generation ? animal1_index : animal2_index;
 				} else {
-					if (d > 0) {
-						killed_type = type2;
-						killed_index = animal2_index;
-						((Fox *) eco->animals[FOX][animal1_index])->hungry = 0;
-					} else if (d < 0) {
-						killed_type = type1;
-						killed_index = animal1_index;
+					if (d < 0) { // Animal 2 é raposa e vai comer o coelho.
+						kill = true;
+
+						// Reseta a fome.
 						((Fox *) eco->animals[FOX][animal2_index])->hungry = 0;
 					}
 				}
 
-				Animal *killed_animal = eco->animals[killed_type][killed_index];
-				eco->matrix[killed_animal->pos.l][killed_animal->pos.c].index = -1;
-				eco->matrix[killed_animal->pos.l][killed_animal->pos.c].type = EMPTY;
+				if (kill) {
+					eco->matrix[animal1->pos.l][animal1->pos.c].index = -1;
+					eco->matrix[animal1->pos.l][animal1->pos.c].type = EMPTY;
 
-				free(killed_animal);
-				eco->animals[killed_type][killed_index] = NULL;
+					free(animal1);
+					eco->animals[type1][animal1_index] = NULL;
+
+					return;
+				}
 			}
 		}
 	}
@@ -233,6 +240,8 @@ void ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 bool gverbose = false;
 
 void ecosystem_print(const Ecosystem *eco) {
+	//printf("%3d | %4d - %4d : %8d\n", eco->current_gen, eco->animal_count[RABBIT], eco->animal_count[FOX], eco->animal_count[RABBIT] + eco->animal_count[FOX]);
+
 	if (!gverbose) {
 		return;
 	}

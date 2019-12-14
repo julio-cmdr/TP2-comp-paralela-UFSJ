@@ -45,8 +45,10 @@ int main(int argc, char *argv[]) {
 		}
 
 		for(j = 0; j < eco.animal_count[FOX]; j++){
-			ecosystem_resolve_conflicts(&eco, j, FOX, RABBIT);
 			ecosystem_resolve_conflicts(&eco, j, FOX, FOX);
+		}
+		for(j = 0; j < eco.animal_count[RABBIT]; j++){
+			ecosystem_resolve_conflicts(&eco, j, RABBIT, FOX);
 		}
 
 		// Updating the position.
@@ -62,7 +64,7 @@ int main(int argc, char *argv[]) {
 	ecosystem_print(&eco);
 
 	eco.n = eco.animal_count[FOX] + eco.animal_count[RABBIT] + eco.rock_count;
-	
+
 	printf("%d %d %d %d %d %d %d\n", eco.gen_proc_rabbits, eco.gen_proc_fox, eco.gen_food_fox, eco.n_gen, eco.l, eco.c, eco.n);
 	for(i = 0; i < eco.l; i++) {
 		for (j = 0; j < eco.c; j++) {
