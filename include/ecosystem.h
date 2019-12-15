@@ -28,7 +28,7 @@ typedef struct ecosystem {
 	int n;
 	int rock_count;
 	int animal_count[2];
-	void **animals[2];
+	Animal **animals[2];
 	Object **matrix;
 }Ecosystem;
 

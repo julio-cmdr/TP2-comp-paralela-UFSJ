@@ -17,6 +17,7 @@ void *new_animal(int type, size_t size, int l, int c) {
     object->next_pos.l = l;
     object->next_pos.c = c;
     object->generation = 0;
+    object->dead = false;
 
     return object;
 }

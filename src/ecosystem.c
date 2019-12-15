@@ -98,7 +98,7 @@ bool get_next_cell(const Ecosystem *eco, int obj_type, int obj_index, int cell_t
 }
 
 void move_rabbit(Ecosystem *eco, int index){
-	Rabbit *rabbit = eco->animals[RABBIT][index];
+	Rabbit *rabbit = (Rabbit*) eco->animals[RABBIT][index];
 
 	if (get_next_cell(eco, RABBIT, index, EMPTY)){
 		if(rabbit->data.generation == eco->gen_proc_rabbits){
@@ -111,7 +111,7 @@ void move_rabbit(Ecosystem *eco, int index){
 }
 
 void move_fox(Ecosystem *eco, int index){
-	Fox *fox = eco->animals[FOX][index];
+	Fox *fox = (Fox*)eco->animals[FOX][index];
 
 	fox->hungry++;
 	bool moved = get_next_cell(eco, FOX, index, RABBIT);
@@ -122,8 +122,7 @@ void move_fox(Ecosystem *eco, int index){
 			eco->matrix[fox->data.pos.l][fox->data.pos.c].index = -1;
 			eco->matrix[fox->data.pos.l][fox->data.pos.c].type = EMPTY;
 
-			free(fox);
-			eco->animals[FOX][index] = NULL;
+			fox->data.dead = true;
 
 			return;
 		} else {
@@ -145,17 +144,17 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 	Animal *animal1 = eco->animals[type1][animal1_index];
 	Animal *animal2 = NULL;
 
-	if (animal1 != NULL) {
+	if (animal1->dead == false) {
 		int d = type1 - type2;
-		bool kill = false;
-		bool kill_by_index = false;
 
-		//int animal2_index = d == 0 ? animal1_index + 1 : 0;
+		//#pragma omp parallel for private(animal2)
 		for (int animal2_index = 0; animal2_index < eco->animal_count[type2]; animal2_index++) {
 			animal2 = eco->animals[type2][animal2_index];
 
+			bool kill = false;
+			bool kill_by_index = false;
 			if (
-				animal1 != animal2 && animal2 != NULL &&
+				animal1 != animal2 && !animal2->dead &&
 				animal1->next_pos.l == animal2->next_pos.l &&
 				animal1->next_pos.c == animal2->next_pos.c
 			) {
@@ -190,8 +189,7 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 					eco->matrix[animal1->pos.l][animal1->pos.c].index = -1;
 					eco->matrix[animal1->pos.l][animal1->pos.c].type = EMPTY;
 
-					free(animal1);
-					eco->animals[type1][animal1_index] = NULL;
+					eco->animals[type1][animal1_index]->dead = true;
 
 					return;
 				}
@@ -202,14 +200,19 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 
 void ecosystem_normalize(Ecosystem *eco, int type) {
 	for (int i = 0; i < eco->animal_count[type]; i++) {
-		if (eco->animals[type][i] == NULL) {
-			do{
+		if (eco->animals[type][i] ->dead == true) {
+			eco->animal_count[type]--;
+			while (i < eco->animal_count[type] && eco->animals[type][eco->animal_count[type]]->dead == true) {
+				free(eco->animals[type][eco->animal_count[type]]);
 				eco->animal_count[type]--;
-			}while(i < eco->animal_count[type] && eco->animals[type][eco->animal_count[type]] == NULL);
+			}
 
 			if (i < eco->animal_count[type]) {
 				Animal *animal = eco->animals[type][eco->animal_count[type]];
+				
 				eco->matrix[animal->pos.l][animal->pos.c].index = i;
+				
+				free(eco->animals[type][i]);
 				eco->animals[type][i] = animal;
 			}
 		}
@@ -219,7 +222,7 @@ void ecosystem_normalize(Ecosystem *eco, int type) {
 void ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 	Animal *animal = eco->animals[type][animal_index];
 
-	if (animal == NULL) {
+	if (animal->dead == true) {
 		return;
 	}
 

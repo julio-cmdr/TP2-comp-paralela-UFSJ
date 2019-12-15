@@ -11,9 +11,10 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 enum {
 	EMPTY = -1,
@@ -32,6 +33,7 @@ typedef struct animal{
 	int type;
 	int generation;
 	void *child;
+	bool dead;
 } Animal;
 
 typedef struct fox{
