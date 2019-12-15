@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
 
 	extern int gverbose;
 	for (i = 2; i < argc; i++) {
-		if (strcmp(argv[i], "-v") == 0) {
-			gverbose = true;
+		if (strcmp(argv[i], "-v") == 0 && i + 1 < argc) {
+			gverbose = atoi(argv[i + 1]);
 			break;
 		}
 	}

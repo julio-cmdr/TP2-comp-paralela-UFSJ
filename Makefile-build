@@ -3,7 +3,7 @@ CC := gcc
 CFLAGS := -Wall -MMD -pg
 
 # Default target
-TARGET := debug
+TARGET := release
 
 # Check for debug/release build
 ifeq ($(TARGET), debug)

@@ -40,5 +40,6 @@ obj
 nbproject/
 .vscode/
 entradas/
+saida/
 ecosystem
 report-*

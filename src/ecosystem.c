@@ -237,16 +237,24 @@ void ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 	eco->matrix[animal->pos.l][animal->pos.c].index = animal_index;
 }
 
-bool gverbose = false;
+int gverbose = 0;
 
 void ecosystem_print(const Ecosystem *eco) {
-	//printf("%3d | %4d - %4d : %8d\n", eco->current_gen, eco->animal_count[RABBIT], eco->animal_count[FOX], eco->animal_count[RABBIT] + eco->animal_count[FOX]);
-
-	if (!gverbose) {
+	if (gverbose == 0) {
 		return;
 	}
-	system("clear");
+
+	if (gverbose > 1) {
+		system("clear");
+	}
+
+	if (gverbose == 1) {
+		printf("%3d | %4d - %4d : %8d\n", eco->current_gen, eco->animal_count[RABBIT], eco->animal_count[FOX], eco->animal_count[RABBIT] + eco->animal_count[FOX]);
+		return;
+	}
+
 	printf("Gen %d\n", eco->current_gen);
+	printf("%3d | %4d - %4d : %8d\n", eco->current_gen, eco->animal_count[RABBIT], eco->animal_count[FOX], eco->animal_count[RABBIT] + eco->animal_count[FOX]);
 
 	for(int i = 0; i < eco->c * 3 + 2; i++) {
 		putchar('-');
