@@ -39,7 +39,7 @@ INCLUDE_PATHS := -I$(IDIR)
 # Libraries
 LIBS :=
 #CFLAGS += `pkg-config --cflags $(LIBS)`
-LOADLIBES = -lm
+LOADLIBES = -lm -fopenmp
 #LOADLIBES += `pkg-config --libs $(LIBS)`
 
 #Compilation line

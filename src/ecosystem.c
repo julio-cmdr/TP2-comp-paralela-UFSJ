@@ -147,7 +147,7 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 	if (animal1->dead == false) {
 		int d = type1 - type2;
 
-		//#pragma omp parallel for private(animal2)
+		#pragma omp parallel for private(animal2)
 		for (int animal2_index = 0; animal2_index < eco->animal_count[type2]; animal2_index++) {
 			animal2 = eco->animals[type2][animal2_index];
 
@@ -191,7 +191,7 @@ void ecosystem_resolve_conflicts(Ecosystem *eco, int animal1_index, int type1, i
 
 					eco->animals[type1][animal1_index]->dead = true;
 
-					return;
+					//break;
 				}
 			}
 		}

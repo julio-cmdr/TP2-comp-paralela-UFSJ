@@ -25,23 +25,22 @@ int main(int argc, char *argv[]) {
 	for(eco.current_gen = 0; eco.current_gen < eco.n_gen; eco.current_gen++){
 		ecosystem_print(&eco);
 		// Deciding movement
-		//pragma aqui
+		#pragma omp parallel for
 		for(j = 0; j < eco.animal_count[RABBIT]; j++){
 			move_rabbit(&eco, j);
 		}
-
+		
 		for(j = 0; j < eco.animal_count[RABBIT]; j++){
 			ecosystem_resolve_conflicts(&eco, j, RABBIT, RABBIT);
 		}
 
 		// Updating the position.
-		//pragma aqui
+		#pragma omp parallel for
 		for (j = 0; j < eco.animal_count[RABBIT]; j++) {
 			ecosystem_update_position(&eco, j, RABBIT);
 		}
 
-		//ecosystem_print(&eco);
-		//pragma aqui
+		#pragma omp parallel for
 		for(j = 0; j < eco.animal_count[FOX]; j++){
 			move_fox(&eco, j);
 		}
@@ -53,7 +52,7 @@ int main(int argc, char *argv[]) {
 			ecosystem_resolve_conflicts(&eco, j, RABBIT, FOX);
 		}
 
-		// Updating the position.
+		#pragma omp parallel for
 		for (j = 0; j < eco.animal_count[FOX]; j++) {
 			ecosystem_update_position(&eco, j, FOX);
 		}
