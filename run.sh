@@ -1,13 +1,14 @@
 run()
 {
-entrada=$1
+exe=$1
+entrada=$2
 saida_prefixo=${entrada//entradas\//}
 
 echo Running $entrada
-./ecosystem $entrada
+./$exe $entrada
 
 echo Analyzing $entrada
-gprof ecosystem gmon.out > saida/report-$saida_prefixo
+gprof $exe gmon.out > saida/report-$saida_prefixo
 gprof2dot -n0 -e0 saida/report-$saida_prefixo > saida/report-$saida_prefixo.dot
 dot -Tpng -osaida/report-$saida_prefixo.png saida/report-$saida_prefixo.dot
 
@@ -17,11 +18,11 @@ echo
 
 ARGC=$#
 
-if [ $ARGC -gt 0 ]; then
-	run $1
+if [ $ARGC -gt 1 ]; then
+	run $1 $2
 else
 	for entry in entradas/*
 	do
-		run "$entry"
+		run $1 "$entry"
 	done
 fi;

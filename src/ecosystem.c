@@ -209,9 +209,9 @@ void ecosystem_normalize(Ecosystem *eco, int type) {
 
 			if (i < eco->animal_count[type]) {
 				Animal *animal = eco->animals[type][eco->animal_count[type]];
-				
+
 				eco->matrix[animal->pos.l][animal->pos.c].index = i;
-				
+
 				free(eco->animals[type][i]);
 				eco->animals[type][i] = animal;
 			}
@@ -227,9 +227,12 @@ void ecosystem_update_position(Ecosystem *eco, int animal_index, int type) {
 	}
 
 	if (animal->child != NULL) {
-		eco->animals[type][eco->animal_count[type]] = animal->child;
-		eco->matrix[animal->pos.l][animal->pos.c].index = eco->animal_count[type]++;
-		animal->child = NULL;
+		#pragma omp critical
+		{
+			eco->animals[type][eco->animal_count[type]] = animal->child;
+			eco->matrix[animal->pos.l][animal->pos.c].index = eco->animal_count[type]++;
+			animal->child = NULL;
+		}
 	} else {
 		eco->matrix[animal->pos.l][animal->pos.c].type = EMPTY;
 		eco->matrix[animal->pos.l][animal->pos.c].index = -1;
